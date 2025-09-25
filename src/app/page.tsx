@@ -193,7 +193,6 @@ function UserCard({ user, isApplied, onApply }: UserCardProps) {
               {user.publicTitle}
             </h3>
             <span className="text-sm text-gray-500">
-              {user.universityYear}
               {user.term} • {user.major}
             </span>
           </div>

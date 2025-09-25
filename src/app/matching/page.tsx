@@ -276,7 +276,6 @@ function SwipeCard({ user, isShortlisted, dragDirection }: SwipeCardProps) {
       <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-6 text-white">
         <h2 className="text-2xl font-bold">{user.publicTitle}</h2>
         <p className="text-purple-100 mt-1">
-          {user.universityYear}
           {user.term} • {user.major}
         </p>
       </div>

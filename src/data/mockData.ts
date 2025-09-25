@@ -50,7 +50,7 @@ const MAJORS = [
   'Sociology', 'Anthropology', 'Environmental Science', 'Nursing', 'Medicine'
 ];
 
-const TERMS = ['1A', '1B', '2A', '2B', '3A', '3B', '4A', '4B'];
+const TERMS = ['1A', '1B', '2A', '2B', '3A', '3B', '4A', '4B', '5A', '5B'];
 
 const PUBLIC_TITLES = [
   'Sick Basketball Player', 'Coffee Addict', 'Future CEO', 'Art Enthusiast',
@@ -131,7 +131,6 @@ export function generateMockUsers(): UserProfile[] {
       id: `user_${i + 1}`,
       realName: NAMES[i % NAMES.length],
       publicTitle: PUBLIC_TITLES[i % PUBLIC_TITLES.length],
-      universityYear: Math.floor(seededRandom(i) * 4) + 1, // 1-4
       term: TERMS[Math.floor(seededRandom(i + 100) * TERMS.length)],
       major: MAJORS[Math.floor(seededRandom(i + 200) * MAJORS.length)],
       facts: generateFacts(i + 300),

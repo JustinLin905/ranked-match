@@ -2,7 +2,6 @@ export interface UserProfile {
   id: string;
   realName: string; // Hidden from other users
   publicTitle: string; // Displayed to others
-  universityYear: number;
   term: string; // '1A', '1B', '2A', '2B', '3A', '3B', '4A', '4B'
   major: string;
   facts: string[]; // Exactly 5 facts/interests
