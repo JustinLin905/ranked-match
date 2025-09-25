@@ -39,8 +39,8 @@ export default function MatchingPage() {
     if (!currentUser) return;
 
     if (direction === "left") {
-      // Reject: remove from front of queue, add to rejected list
       setRejectedUsers((prev) => [...prev, currentUser.id]);
+      // Reject: remove from front of queue, add to rejected list
       setUserQueue((prev) => prev.slice(1)); // Remove first item
     } else if (direction === "right") {
       // Accept: remove from front of queue, add to accepted list
