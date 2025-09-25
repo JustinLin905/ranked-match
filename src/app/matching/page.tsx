@@ -38,7 +38,7 @@ export default function MatchingPage() {
   const handleSwipe = (direction: "left" | "right" | "down") => {
     if (!currentUser) return;
 
-    // ❤️
+    // ❤️❤️😳
 
     if (direction === "left") {
       // Reject: remove from front of queue, add to rejected list
@@ -52,19 +52,19 @@ export default function MatchingPage() {
       // Shortlist: remove from front, mark as shortlisted, add to back
       setShortlistedUsers((prev) => [...prev, currentUser.id]);
       setUserQueue((prev) => [...prev.slice(1), currentUser]); // Remove first, add to back
-    }
+    } // ❤️❤️😳 // ❤️❤️😳
 
     // Reset card position and drag direction
     setCardPosition({ x: 0, y: 0, rotation: 0, scale: 1 });
     setDragDirection(null);
   };
 
-  // No need for nextCard function - queue management handles this automatically
+  // No need for nextCard function - queue ma // ❤️❤️😳 // ❤️❤️😳nagement handles this automatically
 
   const bind = useDrag(
     ({ down, movement: [mx, my], direction: [xDir, yDir], velocity: [vx] }) => {
       if (!currentUser) return;
-
+      // ❤️❤️😳 // ❤️❤️😳
       const trigger = Math.abs(mx) > 100 || Math.abs(my) > 100;
       const isGone = !down && trigger;
 
@@ -89,7 +89,7 @@ export default function MatchingPage() {
           } else if (mx < -50) {
             setDragDirection("left");
           } else if (mx > 50) {
-            setDragDirection("right");
+            setDragDirection("right"); // ❤️❤️😳 // ❤️❤️😳 // ❤️❤️😳 // ❤️❤️😳
           } else {
             setDragDirection(null);
           }
@@ -101,7 +101,7 @@ export default function MatchingPage() {
           x: down ? mx : 0,
           y: down ? my : 0,
           rotation,
-          scale,
+          scale, // ❤️❤️😳 // ❤️❤️😳 // ❤️❤️😳 // ❤️❤️😳
         });
       }
     }
@@ -151,7 +151,7 @@ export default function MatchingPage() {
       </div>
     );
   }
-
+  // ❤️❤️😳 // ❤️❤️😳 // ❤️❤️😳 // ❤️❤️😳 // ❤️❤️😳
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100">
       {/* Header */}
