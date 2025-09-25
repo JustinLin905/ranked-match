@@ -38,9 +38,11 @@ export default function MatchingPage() {
   const handleSwipe = (direction: "left" | "right" | "down") => {
     if (!currentUser) return;
 
+    // ❤️
+
     if (direction === "left") {
-      setRejectedUsers((prev) => [...prev, currentUser.id]);
       // Reject: remove from front of queue, add to rejected list
+      setRejectedUsers((prev) => [...prev, currentUser.id]);
       setUserQueue((prev) => prev.slice(1)); // Remove first item
     } else if (direction === "right") {
       // Accept: remove from front of queue, add to accepted list
