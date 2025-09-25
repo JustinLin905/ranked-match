@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ranked Match - Friend Matching Site
+
+A modern web application for finding friends with niche interests, built with Next.js, TypeScript, and Tailwind CSS.
+
+## Features
+
+### 🏠 Main Browsing Page
+- **Search & Filter**: Find users by public title or tags
+- **Tag Filtering**: Filter by specific interests (Intramurals, Dance, Gaming, etc.)
+- **User Profiles**: Browse anonymized profiles with public titles
+- **Apply System**: Express interest in potential matches
+- **Countdown Timer**: Shows time until next matching period
+
+### 💫 Tinder-like Matching Interface
+- **Swipe Gestures**: 
+  - Swipe left to reject
+  - Swipe right to accept
+  - Swipe down to shortlist for later
+- **Card Stack**: Beautiful animated card stack with depth effect
+- **Profile Details**: View user's facts, tags, and university info
+- **Progress Tracking**: See how many cards remain
+
+### 📊 Results Page
+- **Match Summary**: View all accepted matches
+- **Wait Period**: Clear instructions for next steps
+- **Navigation**: Easy access back to browsing
+
+## Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4
+- **Animations**: Framer Motion
+- **Gestures**: @use-gesture/react
+- **Icons**: Lucide React
 
 ## Getting Started
 
-First, run the development server:
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+2. **Run Development Server**
+   ```bash
+   npm run dev
+   ```
+
+3. **Open Browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── page.tsx              # Main browsing page
+│   ├── matching/page.tsx     # Tinder-like swiping interface
+│   ├── results/page.tsx     # Results and summary page
+│   └── layout.tsx           # Root layout
+├── components/              # Reusable components
+├── data/
+│   └── mockData.ts          # Generated user profiles
+├── types/
+│   └── index.ts             # TypeScript interfaces
+└── hooks/                   # Custom React hooks
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Mock Data
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The application includes 60+ generated user profiles with:
+- Diverse public titles ("Sick Basketball Player", "Coffee Addict", etc.)
+- University information (year, term, major)
+- 5 unique facts per user
+- Random tag assignments
+- Optional social media links
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Key Features
 
-## Learn More
+- **Responsive Design**: Works on desktop and mobile
+- **Smooth Animations**: Card transitions and gesture feedback
+- **Modern UI**: Clean, friendly design with gradients and shadows
+- **Type Safety**: Full TypeScript coverage
+- **Performance**: Optimized with Next.js and modern React patterns
 
-To learn more about Next.js, take a look at the following resources:
+## Development
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Hot Reload**: Changes reflect immediately
+- **Type Checking**: TypeScript ensures code quality
+- **Linting**: ESLint for code consistency
+- **Modern CSS**: Tailwind CSS for rapid styling
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Future Enhancements
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Real user authentication
+- Database integration
+- Real-time matching algorithm
+- Push notifications
+- Mobile app version
+- Advanced filtering options
