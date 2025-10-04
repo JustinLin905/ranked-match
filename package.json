@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@prisma/client": "^6.16.3",
     "@use-gesture/react": "^10.3.1",
     "framer-motion": "^12.23.21",
     "lucide-react": "^0.544.0",
