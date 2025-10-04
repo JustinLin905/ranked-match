@@ -1,33 +1,16 @@
 services:
-  app:
-    container_name: app
-    image: app
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - 3000:3000
-    volumes:
-      - ./:/app
-      - ./node_modules:/app/node_modules
-    depends_on:
-      - postgres
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
   postgres:
-    container_name: postgres
-    image: postgres:15
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
-      - POSTGRES_HOST_AUTH_METHOD=trust
+    image: postgres:latest
+    restart: always
+    container_name: my-db
     ports:
-      - "5432:5432"
+      - 5555:5432
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - default
-
+      - my-db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
 volumes:
-  postgres_data:
+  my-db:
+    driver: local
