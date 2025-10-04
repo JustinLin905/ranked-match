@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "start": "next start"
+    "start": "next start",
+    "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
+    "@prisma/client": "^6.16.3",
     "@use-gesture/react": "^10.3.1",
     "framer-motion": "^12.23.21",
     "lucide-react": "^0.544.0",
@@ -20,7 +22,9 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "prisma": "^6.16.3",
     "tailwindcss": "^4",
+    "tsx": "^4.19.2",
     "typescript": "^5"
   }
 }
