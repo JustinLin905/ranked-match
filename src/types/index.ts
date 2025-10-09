@@ -1,16 +1,36 @@
+// Prisma Term enum values
+export type Term =
+  | "TERM_1A"
+  | "TERM_1B"
+  | "TERM_2A"
+  | "TERM_2B"
+  | "TERM_3A"
+  | "TERM_3B"
+  | "TERM_4A"
+  | "TERM_4B"
+  | "TERM_5A"
+  | "TERM_5B";
+
+export interface Tag {
+  value: string;
+}
+
 export interface UserProfile {
-  id: string;
-  realName: string; // Hidden from other users
-  publicTitle: string; // Displayed to others
-  term: string; // '1A', '1B', '2A', '2B', '3A', '3B', '4A', '4B'
-  major: string;
-  facts: string[]; // Exactly 5 facts/interests
-  tags: string[]; // Zero or more tags
-  socialMediaLinks: {
-    instagram?: string;
-    twitter?: string;
-    linkedin?: string;
-  };
+  email: string; // Primary key
+  firstName: string;
+  lastName: string;
+  program: string; // Replaces 'major'
+  tags: Tag[]; // Array of Tag objects with value
+  highlights: string[]; // Replaces 'facts'
+  term: Term; // Enum type
+  sequence: Record<string, boolean>; // JSON field for term availability
+  bio: string;
+  active_in_cycle: boolean;
+  instagram?: string | null;
+  discord?: string | null;
+  phone?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ApplicationState {
@@ -22,7 +42,7 @@ export interface ApplicationState {
 }
 
 export interface SwipeDirection {
-  direction: 'left' | 'right' | 'down';
+  direction: "left" | "right" | "down";
 }
 
 export interface CardPosition {
