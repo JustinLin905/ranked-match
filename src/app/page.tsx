@@ -1,7 +1,6 @@
 "use client";
 import { Heart, Users, Clock, Search } from "lucide-react";
-import { useState, useMemo } from "react";
-import { mockUsers, AVAILABLE_TAGS } from "@/data/mockData";
+import { useState, useEffect } from "react";
 import { UserProfile } from "@/types";
 import Link from "next/link";
 
@@ -9,23 +8,66 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [appliedUsers, setAppliedUsers] = useState<string[]>([]);
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Filter users based on search term and selected tags
-  const filteredUsers = useMemo(() => {
-    return mockUsers.filter((user) => {
-      const matchesSearch =
-        searchTerm === "" ||
-        user.publicTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.tags.some((tag) =>
-          tag.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+  // Load applied users from localStorage on mount
+  useEffect(() => {
+    const savedApplications = localStorage.getItem("appliedUsers");
+    if (savedApplications) {
+      setAppliedUsers(JSON.parse(savedApplications));
+    }
+  }, []);
 
-      const matchesTags =
-        selectedTags.length === 0 ||
-        selectedTags.every((tag) => user.tags.includes(tag));
+  // Save applied users to localStorage whenever it changes
+  useEffect(() => {
+    if (appliedUsers.length > 0) {
+      localStorage.setItem("appliedUsers", JSON.stringify(appliedUsers));
+    }
+  }, [appliedUsers]);
 
-      return matchesSearch && matchesTags;
-    });
+  // Fetch available tags on mount
+  useEffect(() => {
+    async function fetchTags() {
+      try {
+        const response = await fetch("/api/tags");
+        if (response.ok) {
+          const tags = await response.json();
+          setAvailableTags(tags);
+        }
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      }
+    }
+    fetchTags();
+  }, []);
+
+  // Fetch users whenever search term or selected tags change
+  useEffect(() => {
+    async function fetchUsers() {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (searchTerm) {
+          params.append("search", searchTerm);
+        }
+        if (selectedTags.length > 0) {
+          params.append("tags", selectedTags.join(","));
+        }
+
+        const response = await fetch(`/api/users?${params.toString()}`);
+        if (response.ok) {
+          const data = await response.json();
+          setUsers(data);
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUsers();
   }, [searchTerm, selectedTags]);
 
   const handleApply = (userId: string) => {
@@ -106,7 +148,7 @@ export default function Home() {
                   Filter by Tags:
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {AVAILABLE_TAGS.map((tag) => (
+                  {availableTags.map((tag) => (
                     <button
                       key={tag}
                       onClick={() => handleTagToggle(tag)}
@@ -140,7 +182,7 @@ export default function Home() {
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">
-                Available Matches ({filteredUsers.length})
+                Available Matches ({users.length})
               </h2>
               <div className="flex items-center space-x-2 text-sm text-gray-500">
                 <Users className="h-4 w-4" />
@@ -150,7 +192,12 @@ export default function Home() {
           </div>
 
           <div className="divide-y divide-gray-200">
-            {filteredUsers.length === 0 ? (
+            {loading ? (
+              <div className="px-6 py-12 text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <p className="mt-4 text-gray-500">Loading users...</p>
+              </div>
+            ) : users.length === 0 ? (
               <div className="px-6 py-12 text-center">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -161,12 +208,12 @@ export default function Home() {
                 </p>
               </div>
             ) : (
-              filteredUsers.map((user) => (
+              users.map((user) => (
                 <UserCard
-                  key={user.id}
+                  key={user.email}
                   user={user}
-                  isApplied={appliedUsers.includes(user.id)}
-                  onApply={() => handleApply(user.id)}
+                  isApplied={appliedUsers.includes(user.email)}
+                  onApply={() => handleApply(user.email)}
                 />
               ))
             )}
@@ -184,27 +231,36 @@ interface UserCardProps {
 }
 
 function UserCard({ user, isApplied, onApply }: UserCardProps) {
+  // Format term to display (convert TERM_1A to 1A)
+  const displayTerm = user.term.replace("TERM_", "");
+
   return (
     <div className="px-6 py-4 hover:bg-gray-50 transition-colors">
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <div className="flex items-center space-x-3">
             <h3 className="text-lg font-semibold text-gray-900">
-              {user.publicTitle}
+              {user.firstName} {user.lastName}
             </h3>
             <span className="text-sm text-gray-500">
-              {user.term} • {user.major}
+              {displayTerm} • {user.program}
             </span>
           </div>
+
+          {user.bio && (
+            <p className="mt-1 text-sm text-gray-600 line-clamp-2">
+              {user.bio}
+            </p>
+          )}
 
           {user.tags.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1">
               {user.tags.map((tag) => (
                 <span
-                  key={tag}
+                  key={tag.value}
                   className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
                 >
-                  {tag}
+                  {tag.value}
                 </span>
               ))}
             </div>
