@@ -61,10 +61,10 @@ export default function MatchingPage() {
     fetchAppliedUsers();
   }, []);
 
-  const currentUser = userQueue[0]; // Front of the queue
+	const currentUser = userQueue[0]; // Front of the queue
 
-  const handleSwipe = (direction: "left" | "right" | "down") => {
-    if (!currentUser) return;
+	const handleSwipe = (direction: "left" | "right" | "down") => {
+		if (!currentUser) return;
 
     if (direction === "left") {
       // Reject: remove from front of queue, add to rejected list
@@ -80,10 +80,10 @@ export default function MatchingPage() {
       setUserQueue((prev) => [...prev.slice(1), currentUser]); // Remove first, add to back
     }
 
-    // Reset card position and drag direction
-    setCardPosition({ x: 0, y: 0, rotation: 0, scale: 1 });
-    setDragDirection(null);
-  };
+		// Reset card position and drag direction
+		setCardPosition({ x: 0, y: 0, rotation: 0, scale: 1 });
+		setDragDirection(null);
+	};
 
   const bind = useDrag(
     ({ down, movement: [mx, my], direction: [xDir, yDir], velocity: [vx] }) => {
@@ -92,19 +92,19 @@ export default function MatchingPage() {
       const trigger = Math.abs(mx) > 100 || Math.abs(my) > 100;
       const isGone = !down && trigger;
 
-      if (isGone) {
-        // Determine direction based on movement
-        let dir: "left" | "right" | "down";
-        if (Math.abs(my) > Math.abs(mx) && my > 0) {
-          dir = "down";
-        } else {
-          dir = xDir < 0 ? "left" : "right";
-        }
-        handleSwipe(dir);
-        setDragDirection(null);
-      } else {
-        const rotation = mx * 0.1;
-        const scale = down ? 1.05 : 1;
+			if (isGone) {
+				// Determine direction based on movement
+				let dir: "left" | "right" | "down";
+				if (Math.abs(my) > Math.abs(mx) && my > 0) {
+					dir = "down";
+				} else {
+					dir = xDir < 0 ? "left" : "right";
+				}
+				handleSwipe(dir);
+				setDragDirection(null);
+			} else {
+				const rotation = mx * 0.1;
+				const scale = down ? 1.05 : 1;
 
         // Set drag direction for visual feedback
         if (down) {
@@ -181,23 +181,23 @@ export default function MatchingPage() {
             </p>
           </div>
 
-          <div className="space-y-4">
-            <div className="bg-green-50 rounded-lg p-4">
-              <h2 className="font-semibold text-green-800 mb-2">
-                Accepted Matches
-              </h2>
-              <p className="text-2xl font-bold text-green-600">
-                {acceptedUsers.length}
-              </p>
-            </div>
+					<div className="space-y-4">
+						<div className="bg-green-50 rounded-lg p-4">
+							<h2 className="font-semibold text-green-800 mb-2">
+								Accepted Matches
+							</h2>
+							<p className="text-2xl font-bold text-green-600">
+								{acceptedUsers.length}
+							</p>
+						</div>
 
-            <div className="bg-red-50 rounded-lg p-4">
-              <h2 className="font-semibold text-red-800 mb-2">Rejected</h2>
-              <p className="text-2xl font-bold text-red-600">
-                {rejectedUsers.length}
-              </p>
-            </div>
-          </div>
+						<div className="bg-red-50 rounded-lg p-4">
+							<h2 className="font-semibold text-red-800 mb-2">Rejected</h2>
+							<p className="text-2xl font-bold text-red-600">
+								{rejectedUsers.length}
+							</p>
+						</div>
+					</div>
 
           <button
             onClick={() => (window.location.href = "/results")}
@@ -275,57 +275,57 @@ export default function MatchingPage() {
           </AnimatePresence>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-center space-x-8 mt-8">
-          <button
-            onClick={() => handleSwipe("left")}
-            className="w-14 h-14 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg"
-          >
-            <X className="h-6 w-6" />
-          </button>
+				{/* Action Buttons */}
+				<div className="flex justify-center space-x-8 mt-8">
+					<button
+						onClick={() => handleSwipe("left")}
+						className="w-14 h-14 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg"
+					>
+						<X className="h-6 w-6" />
+					</button>
 
-          <button
-            onClick={() => handleSwipe("down")}
-            className="w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg"
-          >
-            <Bookmark className="h-6 w-6" />
-          </button>
+					<button
+						onClick={() => handleSwipe("down")}
+						className="w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg"
+					>
+						<Bookmark className="h-6 w-6" />
+					</button>
 
-          <button
-            onClick={() => handleSwipe("right")}
-            className="w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600 transition-colors shadow-lg"
-          >
-            <Heart className="h-6 w-6" />
-          </button>
-        </div>
+					<button
+						onClick={() => handleSwipe("right")}
+						className="w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600 transition-colors shadow-lg"
+					>
+						<Heart className="h-6 w-6" />
+					</button>
+				</div>
 
-        {/* Swipe Hints */}
-        <div className="mt-6 text-center text-sm text-gray-600">
-          <p>
-            Swipe left to reject • Swipe down to shortlist • Swipe right to
-            accept
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+				{/* Swipe Hints */}
+				<div className="mt-6 text-center text-sm text-gray-600">
+					<p>
+						Swipe left to reject • Swipe down to shortlist • Swipe right to
+						accept
+					</p>
+				</div>
+			</div>
+		</div>
+	);
 }
 
 interface SwipeCardProps {
-  user: UserProfile;
-  isShortlisted: boolean;
-  dragDirection: "left" | "right" | "down" | null;
+	user: UserProfile;
+	isShortlisted: boolean;
+	dragDirection: "left" | "right" | "down" | null;
 }
 
 function SwipeCard({ user, isShortlisted, dragDirection }: SwipeCardProps) {
-  // Determine background color based on drag direction
-  const getBackgroundColor = () => {
-    if (dragDirection === "left") return "bg-red-50 border-red-200";
-    if (dragDirection === "right") return "bg-green-50 border-green-200";
-    if (dragDirection === "down") return "bg-blue-50 border-blue-200";
-    if (isShortlisted) return "bg-blue-50 border-2 border-blue-200";
-    return "bg-white";
-  };
+	// Determine background color based on drag direction
+	const getBackgroundColor = () => {
+		if (dragDirection === "left") return "bg-red-50 border-red-200";
+		if (dragDirection === "right") return "bg-green-50 border-green-200";
+		if (dragDirection === "down") return "bg-blue-50 border-blue-200";
+		if (isShortlisted) return "bg-blue-50 border-2 border-blue-200";
+		return "bg-white";
+	};
 
   // Format term to display (convert TERM_1A to 1A)
   const displayTerm = user.term.replace("TERM_", "");
@@ -422,23 +422,23 @@ function SwipeCard({ user, isShortlisted, dragDirection }: SwipeCardProps) {
         )}
       </div>
 
-      {/* Swipe Hints */}
-      <div className="absolute bottom-4 left-4 right-4">
-        <div className="flex justify-between text-xs text-gray-400">
-          <div className="flex items-center">
-            <X className="h-4 w-4 mr-1" />
-            <span>Reject</span>
-          </div>
-          <div className="flex items-center">
-            <Bookmark className="h-4 w-4 mr-1" />
-            <span>Shortlist</span>
-          </div>
-          <div className="flex items-center">
-            <Heart className="h-4 w-4 mr-1" />
-            <span>Accept</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+			{/* Swipe Hints */}
+			<div className="absolute bottom-4 left-4 right-4">
+				<div className="flex justify-between text-xs text-gray-400">
+					<div className="flex items-center">
+						<X className="h-4 w-4 mr-1" />
+						<span>Reject</span>
+					</div>
+					<div className="flex items-center">
+						<Bookmark className="h-4 w-4 mr-1" />
+						<span>Shortlist</span>
+					</div>
+					<div className="flex items-center">
+						<Heart className="h-4 w-4 mr-1" />
+						<span>Accept</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }
