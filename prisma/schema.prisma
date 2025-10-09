@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Term {
+    TERM_1A
+    TERM_1B
+    TERM_2A
+    TERM_2B
+    TERM_3A
+    TERM_3B
+    TERM_4A
+    TERM_4B
+    TERM_5A
+    TERM_5B
+} 
+
+model User {
+    email String @id @unique
+    password String
+
+    firstName String
+    lastName String
+    program String
+    tags Tag[]
+    highlights String[]
+    term Term
+    sequence Json // Dict of term names to T/F values if they are on term. Ex: { 'F25': true, 'S25': false }
+    bio String
+    active_in_cycle Boolean @default(true)
+
+    instagram String?
+    discord String?
+    phone String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+
+model Tag {
+    value String @id @unique
+    users User[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
