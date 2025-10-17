@@ -35,9 +35,11 @@ export default function LandingPage() {
 							>
 								Features
 							</a>
-							<Button variant="ghost" size="sm">
-								Log In
-							</Button>
+							<Link href="/login">
+								<Button variant="ghost" size="sm">
+									Log In
+								</Button>
+							</Link>
 							<Link href="/postings">
 								<Button size="sm" className="rounded-full">
 									Get Started
