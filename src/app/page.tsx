@@ -7,6 +7,7 @@ import {
 	ArrowRight,
 	CheckCircle2,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function LandingPage() {
 	return (
@@ -37,9 +38,11 @@ export default function LandingPage() {
 							<Button variant="ghost" size="sm">
 								Log In
 							</Button>
-							<Button size="sm" className="rounded-full">
-								Get Started
-							</Button>
+							<Link href="/postings">
+								<Button size="sm" className="rounded-full">
+									Get Started
+								</Button>
+							</Link>
 						</nav>
 					</div>
 				</div>
@@ -252,8 +255,8 @@ export default function LandingPage() {
 										</div>
 
 										<div className="flex items-center gap-5 p-5 bg-card rounded-[1.5rem] border-4 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
-											<div className="flex h-16 w-16 items-center justify-center rounded-full bg-secondary/50 border-4 border-secondary">
-												<Sparkles className="h-8 w-8 text-secondary-foreground" />
+											<div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 border-4 border-primary/20">
+												<Sparkles className="h-8 w-8 text-primary" />
 											</div>
 											<div>
 												<div className="font-bold text-lg">
