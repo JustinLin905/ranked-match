@@ -17,7 +17,6 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -25,30 +24,37 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 
-const loginSchema = z.object({
-	email: z.string().email("Please enter a valid email address"),
-	password: z.string().min(8, "Password must be at least 8 characters"),
-	rememberMe: z.boolean().default(false),
-});
+const registerSchema = z
+	.object({
+		name: z.string().min(2, "Name must be at least 2 characters"),
+		email: z.string().email("Please enter a valid email address"),
+		password: z.string().min(8, "Password must be at least 8 characters"),
+		confirmPassword: z.string(),
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: "Passwords don't match",
+		path: ["confirmPassword"],
+	});
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export default function LoginPage() {
+export default function RegisterPage() {
 	const router = useRouter();
 
-	const form = useForm<LoginFormValues>({
-		resolver: zodResolver(loginSchema),
+	const form = useForm<RegisterFormValues>({
+		resolver: zodResolver(registerSchema),
 		defaultValues: {
+			name: "",
 			email: "",
 			password: "",
-			rememberMe: false,
+			confirmPassword: "",
 		},
 	});
 
-	function onSubmit(data: LoginFormValues) {
-		console.log("[v0] Login form submitted:", data);
-		// TODO: Implement actual login logic
-		// If successful, navigate to dashboard
+	function onSubmit(data: RegisterFormValues) {
+		console.log("[v0] Registration form submitted:", data);
+		// TODO: Implement actual registration logic
+		// Sucessful redirect to login page
 		router.push("/postings");
 	}
 
@@ -71,10 +77,10 @@ export default function LoginPage() {
 				<Card className="border-4 rounded-[2rem] shadow-2xl">
 					<CardHeader className="space-y-2 text-center pb-6">
 						<CardTitle className="text-3xl font-bold">
-							Welcome <span className="italic text-primary">back</span>
+							Create your <span className="italic text-primary">account</span>
 						</CardTitle>
 						<CardDescription className="text-base">
-							Sign in to your account to continue matching
+							Join the community and start matching with friends
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -85,10 +91,31 @@ export default function LoginPage() {
 							>
 								<FormField
 									control={form.control}
+									name="name"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel className="text-base">Full Name</FormLabel>
+											<FormControl>
+												<Input
+													placeholder="John Doe"
+													type="text"
+													className="h-11 rounded-xl border-2"
+													{...field}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<FormField
+									control={form.control}
 									name="email"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel className="text-base">Email</FormLabel>
+											<FormLabel className="text-base">
+												Waterloo Email
+											</FormLabel>
 											<FormControl>
 												<Input
 													placeholder="you@university.edu"
@@ -110,7 +137,7 @@ export default function LoginPage() {
 											<FormLabel className="text-base">Password</FormLabel>
 											<FormControl>
 												<Input
-													placeholder="Enter your password"
+													placeholder="Create a strong password"
 													type="password"
 													className="h-11 rounded-xl border-2"
 													{...field}
@@ -121,38 +148,32 @@ export default function LoginPage() {
 									)}
 								/>
 
-								<div className="flex items-center justify-between">
-									<FormField
-										control={form.control}
-										name="rememberMe"
-										render={({ field }) => (
-											<FormItem className="flex items-center gap-2 space-y-0">
-												<FormControl>
-													<Checkbox
-														checked={field.value}
-														onCheckedChange={field.onChange}
-														className="rounded-md"
-													/>
-												</FormControl>
-												<FormLabel className="text-sm font-normal cursor-pointer">
-													Remember me
-												</FormLabel>
-											</FormItem>
-										)}
-									/>
-									<Link
-										href="/forgot-password"
-										className="text-sm font-medium text-primary hover:underline"
-									>
-										Forgot password?
-									</Link>
-								</div>
+								<FormField
+									control={form.control}
+									name="confirmPassword"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel className="text-base">
+												Confirm Password
+											</FormLabel>
+											<FormControl>
+												<Input
+													placeholder="Re-enter your password"
+													type="password"
+													className="h-11 rounded-xl border-2"
+													{...field}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 
 								<Button
 									type="submit"
 									className="w-full h-12 text-base rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
 								>
-									Sign In
+									Create Account
 									<ArrowRight className="ml-2 h-5 w-5" />
 								</Button>
 							</form>
@@ -160,17 +181,28 @@ export default function LoginPage() {
 
 						<div className="mt-6 text-center">
 							<p className="text-sm text-muted-foreground">
-								Don't have an account?
+								Already have an account?{" "}
 								<Link
-									href="/register"
+									href="/login"
 									className="font-medium text-primary hover:underline"
 								>
-									Sign up
+									Sign in
 								</Link>
 							</p>
 						</div>
 					</CardContent>
 				</Card>
+
+				<p className="text-center text-sm text-muted-foreground mt-6">
+					By creating an account, you agree to our{" "}
+					<Link href="/terms" className="underline hover:text-foreground">
+						Terms
+					</Link>{" "}
+					and{" "}
+					<Link href="/privacy" className="underline hover:text-foreground">
+						Privacy Policy
+					</Link>
+				</p>
 			</div>
 		</div>
 	);
