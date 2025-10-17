@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "../../../../generated/prisma";
+import { getCurrentUser } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
+    // Check authentication
+    const currentUserEmail = await getCurrentUser();
+    if (!currentUserEmail) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const tagsParam = searchParams.get("tags");
     const searchTerm = searchParams.get("search");
