@@ -192,17 +192,6 @@ export default function RegisterPage() {
 						</div>
 					</CardContent>
 				</Card>
-
-				<p className="text-center text-sm text-muted-foreground mt-6">
-					By creating an account, you agree to our{" "}
-					<Link href="/terms" className="underline hover:text-foreground">
-						Terms
-					</Link>{" "}
-					and{" "}
-					<Link href="/privacy" className="underline hover:text-foreground">
-						Privacy Policy
-					</Link>
-				</p>
 			</div>
 		</div>
 	);
