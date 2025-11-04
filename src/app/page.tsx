@@ -72,20 +72,15 @@ export default function LandingPage() {
 							chats.
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center">
-							<Button
-								size="lg"
-								className="text-lg px-10 py-7 rounded-full shadow-2xl shadow-primary/30 hover:shadow-primary/40 transition-all hover:scale-105"
-							>
-								Get Started
-								<ArrowRight className="ml-2 h-5 w-5" />
-							</Button>
-							<Button
-								size="lg"
-								variant="outline"
-								className="text-lg px-10 py-7 rounded-full bg-card border-2 hover:bg-secondary/50 transition-all"
-							>
-								Learn More
-							</Button>
+							<Link href="/login">
+								<Button
+									size="lg"
+									className="text-lg px-10 py-7 rounded-full shadow-2xl shadow-primary/30 hover:shadow-primary/40 transition-all hover:scale-105"
+								>
+									Get Started
+									<ArrowRight className="ml-2 h-5 w-5" />
+								</Button>
+							</Link>
 						</div>
 					</div>
 				</div>
@@ -308,14 +303,16 @@ export default function LandingPage() {
 							introductions.
 						</p>
 						<div className="flex flex-col sm:flex-row gap-6 justify-center">
-							<Button
-								size="lg"
-								variant="secondary"
-								className="text-lg px-12 py-7 rounded-full shadow-2xl hover:shadow-3xl transition-all hover:scale-105"
-							>
-								Create Your Profile
-								<ArrowRight className="ml-2 h-5 w-5" />
-							</Button>
+							<Link href="/login">
+								<Button
+									size="lg"
+									variant="secondary"
+									className="text-lg px-12 py-7 rounded-full shadow-2xl hover:shadow-3xl transition-all hover:scale-105"
+								>
+									Create Your Profile
+									<ArrowRight className="ml-2 h-5 w-5" />
+								</Button>
+							</Link>
 							<Button
 								size="lg"
 								variant="outline"
