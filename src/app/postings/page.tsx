@@ -30,7 +30,7 @@ interface UserProfile {
 	program: string;
 	tags: Tag[];
 	bio?: string;
-	term: string;
+	term?: string;
 	highlights?: string[];
 }
 
@@ -315,14 +315,16 @@ export default function PostingsPage() {
 								</p>
 							</div>
 						) : (
-							users.map((user) => (
-								<UserCard
-									key={user.email}
-									user={user}
-									isApplied={appliedUsers.includes(user.email)}
-									onApply={() => handleApply(user.email)}
-								/>
-							))
+							users
+								.filter((user) => user.term && user.term.trim() !== "")
+								.map((user) => (
+									<UserCard
+										key={user.email}
+										user={user}
+										isApplied={appliedUsers.includes(user.email)}
+										onApply={() => handleApply(user.email)}
+									/>
+								))
 						)}
 					</div>
 				</Card>
@@ -339,7 +341,7 @@ interface UserCardProps {
 
 function UserCard({ user, isApplied, onApply }: UserCardProps) {
 	// Format term to display (convert TERM_1A to 1A)
-	const displayTerm = user.term.replace("TERM_", "");
+	const displayTerm = user.term?.replace("TERM_", "") || "Unknown";
 
 	return (
 		<div className="px-6 py-5 hover:bg-secondary/30 transition-colors">
