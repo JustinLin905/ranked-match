@@ -126,7 +126,12 @@ export default function PostingsPage() {
 	}, [searchTerm, selectedTags]);
 
 	const handleApply = (userId: string) => {
-		setAppliedUsers((prev) => [...prev, userId]);
+		setAppliedUsers(
+			(prev) =>
+				prev.includes(userId)
+					? prev.filter((id) => id !== userId) // Remove if already applied (unapply)
+					: [...prev, userId] // Add if not applied (apply)
+		);
 	};
 
 	const handleTagToggle = (tag: string) => {
@@ -393,18 +398,18 @@ function UserCard({ user, isApplied, onApply }: UserCardProps) {
 				<div className="flex-shrink-0">
 					<Button
 						onClick={onApply}
-						disabled={isApplied}
 						size="lg"
+						variant={isApplied ? "outline" : "default"}
 						className={`rounded-full min-w-[120px] transition-all ${
 							isApplied
-								? "bg-primary/20 text-primary hover:bg-primary/20 cursor-not-allowed"
+								? "border-primary text-primary hover:bg-primary hover:text-primary-foreground"
 								: "shadow-lg hover:shadow-xl hover:scale-105"
 						}`}
 					>
 						{isApplied ? (
 							<>
-								<CheckCircle2 className="h-4 w-4 mr-2" />
-								Applied
+								<X className="h-4 w-4 mr-2" />
+								Unapply
 							</>
 						) : (
 							<>
