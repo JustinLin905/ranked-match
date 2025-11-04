@@ -29,6 +29,7 @@ export default function VerifyPage() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
+	const redirectPath = searchParams.get("redirect");
 
 	const [status, setStatus] = useState<"loading" | "success" | "error">(
 		"loading"
@@ -118,10 +119,15 @@ export default function VerifyPage() {
 							router.push("/setup");
 						}, 2000);
 					} else {
-						setMessage("Welcome back! Redirecting to postings...");
-						// Redirect to postings page after 2 seconds
+						const targetPath = redirectPath || "/postings";
+						setMessage(
+							`Welcome back! Redirecting${
+								redirectPath ? " to your requested page" : " to postings"
+							}...`
+						);
+						// Redirect to target page after 2 seconds
 						setTimeout(() => {
-							router.push("/postings");
+							router.push(targetPath);
 						}, 2000);
 					}
 				} else {

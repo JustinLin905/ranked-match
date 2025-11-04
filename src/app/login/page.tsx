@@ -22,7 +22,8 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 const loginSchema = z.object({
 	email: z
@@ -40,6 +41,8 @@ export default function LoginPage() {
 	const [isSubmitted, setIsSubmitted] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [redirectPath, setRedirectPath] = useState<string | null>(null);
+	const searchParams = useSearchParams();
 
 	const form = useForm<LoginFormValues>({
 		resolver: zodResolver(loginSchema),
@@ -48,17 +51,29 @@ export default function LoginPage() {
 		},
 	});
 
+	useEffect(() => {
+		const redirect = searchParams.get("redirect");
+		if (redirect) {
+			setRedirectPath(redirect);
+		}
+	}, [searchParams]);
+
 	async function onSubmit(data: LoginFormValues) {
 		setIsLoading(true);
 		setError(null);
 
 		try {
+			const requestBody: any = { email: data.email };
+			if (redirectPath) {
+				requestBody.redirect = redirectPath;
+			}
+
 			const response = await fetch("/api/auth/request-login", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify(data),
+				body: JSON.stringify(requestBody),
 			});
 
 			const result = await response.json();
