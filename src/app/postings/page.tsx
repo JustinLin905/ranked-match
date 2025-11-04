@@ -279,7 +279,7 @@ export default function PostingsPage() {
 						<div className="flex items-center justify-between">
 							<h2 className="text-xl font-bold text-foreground flex items-center gap-2">
 								<Users className="h-5 w-5 text-primary" />
-								Available Matches ({users.length})
+								Available Matches ({users.length - 1})
 							</h2>
 							<div className="flex items-center gap-2 text-sm text-muted-foreground">
 								<CheckCircle2 className="h-4 w-4 text-primary" />
