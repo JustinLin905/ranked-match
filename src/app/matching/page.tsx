@@ -3,16 +3,21 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDrag } from "@use-gesture/react";
-import { X, Heart, Bookmark } from "lucide-react";
+import { X, Heart, Bookmark, User, LogOut } from "lucide-react";
 import { UserProfile } from "@/types";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function MatchingPage() {
+  const router = useRouter();
   const [acceptedUsers, setAcceptedUsers] = useState<UserProfile[]>([]);
   const [rejectedUsers, setRejectedUsers] = useState<string[]>([]);
   const [shortlistedUsers, setShortlistedUsers] = useState<string[]>([]);
   const [userQueue, setUserQueue] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalUsers, setTotalUsers] = useState(0);
+  const [currentUserProfile, setCurrentUserProfile] = useState<{ firstName?: string; lastName?: string } | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [cardPosition, setCardPosition] = useState({
     x: 0,
     y: 0,
@@ -22,6 +27,22 @@ export default function MatchingPage() {
   const [dragDirection, setDragDirection] = useState<
     "left" | "right" | "down" | null
   >(null);
+
+  // Fetch current user profile on mount
+  useEffect(() => {
+    async function fetchCurrentUser() {
+      try {
+        const response = await fetch("/api/profile");
+        if (response.ok) {
+          const data = await response.json();
+          setCurrentUserProfile({ firstName: data.firstName, lastName: data.lastName });
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
+    }
+    fetchCurrentUser();
+  }, []);
 
   // Fetch users that the current user has applied to
   useEffect(() => {
@@ -62,6 +83,23 @@ export default function MatchingPage() {
   }, []);
 
 	const currentUser = userQueue[0]; // Front of the queue
+
+	const handleLogout = async () => {
+		setIsLoggingOut(true);
+		try {
+			const response = await fetch("/api/auth/logout", {
+				method: "POST",
+			});
+
+			if (response.ok) {
+				router.push("/login");
+			}
+		} catch (error) {
+			console.error("Error logging out:", error);
+		} finally {
+			setIsLoggingOut(false);
+		}
+	};
 
 	const handleSwipe = (direction: "left" | "right" | "down") => {
 		if (!currentUser) return;
@@ -217,9 +255,26 @@ export default function MatchingPage() {
         <div className="max-w-md mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold text-gray-900">Matching</h1>
-            <div className="text-sm text-gray-500">
-              {rejectedUsers.length + acceptedUsers.length} of {totalUsers}{" "}
-              decided
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-gray-500">
+                {rejectedUsers.length + acceptedUsers.length} of {totalUsers}{" "}
+                decided
+              </div>
+              <Link
+                href="/profile"
+                className="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-1.5"
+              >
+                <User className="h-4 w-4" />
+                {currentUserProfile?.firstName ? `${currentUserProfile.firstName}` : "Profile"}
+              </Link>
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="px-3 py-1.5 border border-red-300 text-red-700 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+              >
+                <LogOut className="h-4 w-4" />
+                {isLoggingOut ? "..." : "Logout"}
+              </button>
             </div>
           </div>
         </div>

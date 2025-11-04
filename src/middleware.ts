@@ -6,9 +6,12 @@ const protectedPaths = [
   "/postings",
   "/matching",
   "/results",
+  "/setup",
+  "/profile",
   "/api/users",
   "/api/applications",
   "/api/tags",
+  "/api/profile",
 ];
 
 // Paths that are public (accessible without authentication)

@@ -16,8 +16,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowRight, ArrowLeft, X, ChevronDown, Check } from "lucide-react";
+import { ArrowRight, ArrowLeft, X, ChevronDown, Check, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -87,7 +86,7 @@ const SEMESTER_TERMS = [
 	{ value: "S29", label: "Spring 2029" },
 ];
 
-export default function SetupPage() {
+export default function EditProfilePage() {
 	const router = useRouter();
 	const [step, setStep] = useState(1);
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -97,6 +96,7 @@ export default function SetupPage() {
 	const [availableTags, setAvailableTags] = useState<string[]>([]);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [submitError, setSubmitError] = useState<string | null>(null);
+	const [loading, setLoading] = useState(true);
 	const [termSequence, setTermSequence] = useState<Record<string, boolean>>({
 		F24: false,
 		W25: false,
@@ -122,6 +122,7 @@ export default function SetupPage() {
 		trigger,
 		setValue,
 		watch,
+		reset,
 	} = useForm<SetupFormData>({
 		resolver: zodResolver(setupSchema),
 		defaultValues: {
@@ -132,6 +133,77 @@ export default function SetupPage() {
 	});
 
 	const currentTerm = watch("term");
+
+	// Fetch available tags on mount
+	useEffect(() => {
+		async function fetchTags() {
+			try {
+				const response = await fetch("/api/tags");
+				if (response.ok) {
+					const tags = await response.json();
+					setAvailableTags(tags);
+				}
+			} catch (error) {
+				console.error("Error fetching tags:", error);
+			}
+		}
+		fetchTags();
+	}, []);
+
+	// Fetch current profile data on mount
+	useEffect(() => {
+		async function fetchProfile() {
+			try {
+				const response = await fetch("/api/profile");
+				
+				if (!response.ok) {
+					if (response.status === 401) {
+						router.push("/login");
+						return;
+					}
+					throw new Error("Failed to fetch profile");
+				}
+
+				const data = await response.json();
+				
+				// Populate form fields
+				setValue("firstName", data.firstName || "");
+				setValue("lastName", data.lastName || "");
+				setValue("program", data.program || "");
+				setValue("bio", data.bio || "");
+				setValue("term", data.term || "TERM_1A");
+				setValue("instagram", data.instagram || "");
+				setValue("discord", data.discord || "");
+				setValue("phone", data.phone || "");
+				
+				// Set highlights
+				if (data.highlights && data.highlights.length > 0) {
+					setHighlights(data.highlights);
+					setValue("highlights", data.highlights);
+				}
+				
+				// Set tags
+				if (data.tags && data.tags.length > 0) {
+					setSelectedTags(data.tags);
+					setValue("tags", data.tags);
+				}
+				
+				// Set sequence
+				if (data.sequence) {
+					setTermSequence(data.sequence);
+					setValue("sequence", data.sequence);
+				}
+				
+				setLoading(false);
+			} catch (err) {
+				console.error("Error fetching profile:", err);
+				setSubmitError("Failed to load profile");
+				setLoading(false);
+			}
+		}
+
+		fetchProfile();
+	}, [router, setValue]);
 
 	const toggleTag = (tag: string) => {
 		const newTags = selectedTags.includes(tag)
@@ -182,22 +254,6 @@ export default function SetupPage() {
 		}
 		return `${selected.length} terms selected`;
 	};
-
-	// Fetch available tags on mount
-	useEffect(() => {
-		async function fetchTags() {
-			try {
-				const response = await fetch("/api/tags");
-				if (response.ok) {
-					const tags = await response.json();
-					setAvailableTags(tags);
-				}
-			} catch (error) {
-				console.error("Error fetching tags:", error);
-			}
-		}
-		fetchTags();
-	}, []);
 
 	// Close dropdown when clicking outside
 	useEffect(() => {
@@ -260,17 +316,25 @@ export default function SetupPage() {
 				throw new Error(result.error || "Failed to save profile");
 			}
 
-			// Redirect to postings page
-			router.push("/postings");
+			// Redirect to profile view page
+			router.push("/profile");
 		} catch (error) {
-			console.error("Setup submission error:", error);
+			console.error("Profile update error:", error);
 			setSubmitError(
-				error instanceof Error ? error.message : "Failed to complete setup"
+				error instanceof Error ? error.message : "Failed to update profile"
 			);
 		} finally {
 			setIsSubmitting(false);
 		}
 	};
+
+	if (loading) {
+		return (
+			<div className="min-h-screen flex items-center justify-center">
+				<Loader2 className="h-8 w-8 animate-spin text-primary" />
+			</div>
+		);
+	}
 
 	return (
 		<div className="min-h-screen bg-background relative overflow-hidden flex items-center justify-center p-4">
@@ -280,11 +344,11 @@ export default function SetupPage() {
 
 			<div className="w-full max-w-2xl relative z-10">
 				<div className="text-center mb-8">
-					<Link href="/" className="inline-block mb-4">
-						<h1 className="text-3xl font-bold">RankedMatch</h1>
+					<Link href="/profile" className="inline-block mb-4">
+						<h1 className="text-3xl font-bold">Edit Profile</h1>
 					</Link>
 					<p className="text-muted-foreground">
-						Step {step} of 4 - Let's set up your profile
+						Step {step} of 4 - Update your profile information
 					</p>
 					<div className="flex gap-2 justify-center mt-4">
 						{[1, 2, 3, 4].map((s) => (
@@ -307,10 +371,10 @@ export default function SetupPage() {
 							{step === 4 && "Contact Information"}
 						</CardTitle>
 						<CardDescription>
-							{step === 1 && "Tell us who you are"}
-							{step === 2 && "Share your interests and highlights"}
-							{step === 3 && "When will you be active?"}
-							{step === 4 && "How can matches contact you?"}
+							{step === 1 && "Update your basic details"}
+							{step === 2 && "Update your interests and highlights"}
+							{step === 3 && "Update your availability"}
+							{step === 4 && "Update how matches can contact you"}
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -610,19 +674,12 @@ export default function SetupPage() {
 											placeholder="@username"
 										/>
 									</div>
-									<div className="p-4 bg-muted rounded-lg">
-										<p className="text-sm text-muted-foreground">
-											<strong>Note:</strong> All contact information is optional
-											and will only be shared with your confirmed matches. You
-											can update this anytime in your profile settings.
-										</p>
-									</div>
 								</div>
 							)}
 
 							{/* Navigation Buttons */}
 							<div className="flex justify-between pt-4">
-								{step > 1 && (
+								{step > 1 ? (
 									<Button
 										type="button"
 										variant="outline"
@@ -632,6 +689,12 @@ export default function SetupPage() {
 										<ArrowLeft className="mr-2 h-4 w-4" />
 										Back
 									</Button>
+								) : (
+									<Link href="/profile">
+										<Button type="button" variant="outline">
+											Cancel
+										</Button>
+									</Link>
 								)}
 								<Button
 									type="button"
@@ -642,7 +705,7 @@ export default function SetupPage() {
 									{isSubmitting
 										? "Saving..."
 										: step === 4
-										? "Complete Setup"
+										? "Save Changes"
 										: "Next"}
 									{!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
 								</Button>
@@ -654,3 +717,4 @@ export default function SetupPage() {
 		</div>
 	);
 }
+
