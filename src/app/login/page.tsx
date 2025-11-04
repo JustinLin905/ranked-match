@@ -102,9 +102,7 @@ export default function LoginPage() {
 									Check your <span className="italic text-primary">email</span>
 								</span>
 							) : (
-								<>
-									Welcome <span className="italic text-primary">back</span>
-								</>
+								<>Welcome!</>
 							)}
 						</CardTitle>
 						<CardDescription className="text-base">
@@ -195,20 +193,6 @@ export default function LoginPage() {
 									</Button>
 								</form>
 							</Form>
-						)}
-
-						{!isSubmitted && (
-							<div className="mt-6 text-center">
-								<p className="text-sm text-muted-foreground">
-									Don't have an account?{" "}
-									<Link
-										href="/register"
-										className="font-medium text-primary hover:underline"
-									>
-										Sign up
-									</Link>
-								</p>
-							</div>
 						)}
 					</CardContent>
 				</Card>
