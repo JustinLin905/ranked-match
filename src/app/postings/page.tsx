@@ -43,6 +43,7 @@ export default function PostingsPage() {
 	const [availableTags, setAvailableTags] = useState<string[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [currentUser, setCurrentUser] = useState<{
+		email?: string;
 		firstName?: string;
 		lastName?: string;
 	} | null>(null);
@@ -71,6 +72,7 @@ export default function PostingsPage() {
 				if (response.ok) {
 					const data = await response.json();
 					setCurrentUser({
+						email: data.email,
 						firstName: data.firstName,
 						lastName: data.lastName,
 					});
@@ -161,6 +163,19 @@ export default function PostingsPage() {
 			setIsLoggingOut(false);
 		}
 	};
+
+	// Calculate available matches count (exclude current user and users without terms)
+	const availableMatchesCount = users.filter((user) => {
+		// Exclude current user
+		if (currentUser?.email && user.email === currentUser.email) {
+			return false;
+		}
+		// Exclude users without terms
+		if (!user.term || user.term.trim() === "") {
+			return false;
+		}
+		return true;
+	}).length;
 
 	return (
 		<div className="min-h-screen bg-background relative overflow-hidden">
@@ -279,7 +294,7 @@ export default function PostingsPage() {
 						<div className="flex items-center justify-between">
 							<h2 className="text-xl font-bold text-foreground flex items-center gap-2">
 								<Users className="h-5 w-5 text-primary" />
-								Available Matches ({users.length - 1})
+								Available Matches ({availableMatchesCount})
 							</h2>
 							<div className="flex items-center gap-2 text-sm text-muted-foreground">
 								<CheckCircle2 className="h-4 w-4 text-primary" />
@@ -302,7 +317,7 @@ export default function PostingsPage() {
 									Loading matches...
 								</p>
 							</div>
-						) : users.length === 0 ? (
+						) : availableMatchesCount === 0 ? (
 							<div className="px-6 py-16 text-center">
 								<div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mx-auto mb-4">
 									<Users className="h-8 w-8 text-muted-foreground" />
