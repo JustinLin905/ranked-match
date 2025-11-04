@@ -36,13 +36,8 @@ export default function LandingPage() {
 								Features
 							</a>
 							<Link href="/login">
-								<Button variant="ghost" size="sm">
-									Log In
-								</Button>
-							</Link>
-							<Link href="/postings">
 								<Button size="sm" className="rounded-full">
-									Get Started
+									Login/Register
 								</Button>
 							</Link>
 						</nav>

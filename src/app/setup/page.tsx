@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -17,8 +17,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowRight, ArrowLeft, X } from "lucide-react";
+import { ArrowRight, ArrowLeft, X, ChevronDown, Check } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const setupSchema = z.object({
 	firstName: z.string().min(1, "First name is required"),
@@ -30,8 +31,22 @@ const setupSchema = z.object({
 		.max(500, "Bio must be less than 500 characters"),
 	highlights: z.array(z.string()).min(1, "Add at least one highlight"),
 	tags: z.array(z.string()).min(1, "Select at least one interest"),
-	term: z.enum(["F24", "W25", "S25", "F25", "W26"]),
-	sequence: z.record(z.boolean()),
+	term: z.enum([
+		"TERM_1A",
+		"TERM_1B",
+		"TERM_2A",
+		"TERM_2B",
+		"TERM_3A",
+		"TERM_3B",
+		"TERM_4A",
+		"TERM_4B",
+	]),
+	sequence: z
+		.record(z.string(), z.boolean())
+		.refine(
+			(sequence) => Object.values(sequence).some(Boolean),
+			"Please select at least one active term"
+		),
 	instagram: z.string().optional(),
 	discord: z.string().optional(),
 	phone: z.string().optional(),
@@ -59,24 +74,57 @@ const AVAILABLE_TAGS = [
 ];
 
 const TERMS = [
+	{ value: "TERM_1A", label: "1A" },
+	{ value: "TERM_1B", label: "1B" },
+	{ value: "TERM_2A", label: "2A" },
+	{ value: "TERM_2B", label: "2B" },
+	{ value: "TERM_3A", label: "3A" },
+	{ value: "TERM_3B", label: "3B" },
+	{ value: "TERM_4A", label: "4A" },
+	{ value: "TERM_4B", label: "4B" },
+];
+
+const SEMESTER_TERMS = [
 	{ value: "F24", label: "Fall 2024" },
 	{ value: "W25", label: "Winter 2025" },
 	{ value: "S25", label: "Spring 2025" },
 	{ value: "F25", label: "Fall 2025" },
 	{ value: "W26", label: "Winter 2026" },
+	{ value: "S26", label: "Spring 2026" },
+	{ value: "F26", label: "Fall 2026" },
+	{ value: "W27", label: "Winter 2027" },
+	{ value: "S27", label: "Spring 2027" },
+	{ value: "F27", label: "Fall 2027" },
+	{ value: "W28", label: "Winter 2028" },
+	{ value: "S28", label: "Spring 2028" },
+	{ value: "F28", label: "Fall 2028" },
+	{ value: "W29", label: "Winter 2029" },
+	{ value: "S29", label: "Spring 2029" },
 ];
 
 export default function SetupPage() {
+	const router = useRouter();
 	const [step, setStep] = useState(1);
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [highlights, setHighlights] = useState<string[]>([]);
 	const [highlightInput, setHighlightInput] = useState("");
+	const [isTermDropdownOpen, setIsTermDropdownOpen] = useState(false);
 	const [termSequence, setTermSequence] = useState<Record<string, boolean>>({
 		F24: false,
 		W25: false,
 		S25: false,
 		F25: false,
 		W26: false,
+		S26: false,
+		F26: false,
+		W27: false,
+		S27: false,
+		F27: false,
+		W28: false,
+		S28: false,
+		F28: false,
+		W29: false,
+		S29: false,
 	});
 
 	const {
@@ -126,6 +174,42 @@ export default function SetupPage() {
 		setValue("sequence", newSequence);
 	};
 
+	// Helper functions for multi-select dropdown
+	const getSelectedTerms = () => {
+		return Object.entries(termSequence)
+			.filter(([_, selected]) => selected)
+			.map(([term, _]) => term);
+	};
+
+	const getSelectedTermsCount = () => {
+		return getSelectedTerms().length;
+	};
+
+	const getSelectedTermsDisplay = () => {
+		const selected = getSelectedTerms();
+		if (selected.length === 0) return "Select terms...";
+		if (selected.length === 1) {
+			const term = SEMESTER_TERMS.find((t) => t.value === selected[0]);
+			return term?.label || selected[0];
+		}
+		return `${selected.length} terms selected`;
+	};
+
+	// Close dropdown when clicking outside
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (isTermDropdownOpen) {
+				const target = event.target as Element;
+				if (!target.closest('[data-dropdown="term-selector"]')) {
+					setIsTermDropdownOpen(false);
+				}
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => document.removeEventListener("mousedown", handleClickOutside);
+	}, [isTermDropdownOpen]);
+
 	const nextStep = async () => {
 		let fieldsToValidate: (keyof SetupFormData)[] = [];
 
@@ -135,9 +219,23 @@ export default function SetupPage() {
 			fieldsToValidate = ["bio", "highlights", "tags"];
 		} else if (step === 3) {
 			fieldsToValidate = ["term", "sequence"];
+		} else if (step === 4) {
+			// Step 4 is the last step - redirect to postings
+			try {
+				// TODO: Submit form data to API here
+				console.log("Setup completed, redirecting to postings...");
+				router.push("/postings");
+				return;
+			} catch (error) {
+				console.error("Failed to complete setup:", error);
+				return;
+			}
 		}
+		// Step 4 is contact info (all optional), no validation needed
 
-		const isValid = await trigger(fieldsToValidate);
+		const isValid =
+			fieldsToValidate.length === 0 || (await trigger(fieldsToValidate));
+
 		if (isValid) {
 			setStep(step + 1);
 		}
@@ -149,9 +247,20 @@ export default function SetupPage() {
 
 	const onSubmit = async (data: SetupFormData) => {
 		console.log("[v0] Setup form submitted:", data);
-		// TODO: Send data to API
-		// For now, just log and redirect
-		alert("Profile setup complete!");
+
+		try {
+			// TODO: Send data to API
+			// For now, just simulate success and redirect
+
+			// Show success message briefly
+			alert("Profile setup complete! Redirecting to postings...");
+
+			// Redirect to postings page
+			router.push("/postings");
+		} catch (error) {
+			console.error("Setup submission error:", error);
+			alert("Failed to complete setup. Please try again.");
+		}
 	};
 
 	return (
@@ -186,13 +295,13 @@ export default function SetupPage() {
 							{step === 1 && "Basic Information"}
 							{step === 2 && "About You"}
 							{step === 3 && "Terms & Availability"}
-							{step === 4 && "Connect (Optional)"}
+							{step === 4 && "Contact Information"}
 						</CardTitle>
 						<CardDescription>
 							{step === 1 && "Tell us who you are"}
 							{step === 2 && "Share your interests and highlights"}
 							{step === 3 && "When will you be active?"}
-							{step === 4 && "Add your social handles to connect with matches"}
+							{step === 4 && "How can matches contact you?"}
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -378,45 +487,97 @@ export default function SetupPage() {
 										<p className="text-sm text-muted-foreground">
 											Select which terms you'll be available for activities
 										</p>
-										<div className="space-y-2">
-											{TERMS.map((term) => (
-												<div
-													key={term.value}
-													className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+										<div className="relative" data-dropdown="term-selector">
+											<button
+												type="button"
+												onClick={() =>
+													setIsTermDropdownOpen(!isTermDropdownOpen)
+												}
+												className="w-full p-3 border border-border rounded-lg bg-background text-left flex items-center justify-between hover:border-primary/50 transition-colors"
+											>
+												<span
+													className={
+														getSelectedTermsCount() === 0
+															? "text-muted-foreground"
+															: ""
+													}
 												>
-													<Checkbox
-														id={`term-${term.value}`}
-														checked={termSequence[term.value]}
-														onCheckedChange={() =>
-															toggleTermSequence(term.value)
-														}
-													/>
-													<label
-														htmlFor={`term-${term.value}`}
-														className="flex-1 cursor-pointer"
-													>
-														{term.label}
-													</label>
+													{getSelectedTermsDisplay()}
+												</span>
+												<ChevronDown
+													className={`h-4 w-4 transition-transform ${
+														isTermDropdownOpen ? "rotate-180" : ""
+													}`}
+												/>
+											</button>
+
+											{isTermDropdownOpen && (
+												<div className="absolute z-10 w-full mt-1 bg-background border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+													{SEMESTER_TERMS.map((term) => (
+														<div
+															key={term.value}
+															onClick={() => toggleTermSequence(term.value)}
+															className="flex items-center space-x-2 p-3 hover:bg-muted cursor-pointer transition-colors"
+														>
+															<div className="w-4 h-4 border border-border rounded flex items-center justify-center">
+																{termSequence[term.value] && (
+																	<Check className="h-3 w-3 text-primary" />
+																)}
+															</div>
+															<span className="flex-1">{term.label}</span>
+														</div>
+													))}
 												</div>
-											))}
+											)}
 										</div>
+
+										{getSelectedTermsCount() > 0 && (
+											<div className="flex flex-wrap gap-1 mt-2">
+												{getSelectedTerms().map((termValue) => {
+													const term = SEMESTER_TERMS.find(
+														(t) => t.value === termValue
+													);
+													return (
+														<Badge
+															key={termValue}
+															variant="secondary"
+															className="text-xs py-1 px-2"
+														>
+															{term?.label}
+															<button
+																type="button"
+																onClick={() => toggleTermSequence(termValue)}
+																className="ml-1 hover:text-destructive"
+															>
+																<X className="h-3 w-3" />
+															</button>
+														</Badge>
+													);
+												})}
+											</div>
+										)}
+										{errors.sequence && (
+											<p className="text-sm text-destructive">
+												Please select at least one active term
+											</p>
+										)}
 									</div>
 								</div>
 							)}
 
-							{/* Step 4: Connect */}
+							{/* Step 4: Contact Information */}
 							{step === 4 && (
 								<div className="space-y-4">
 									<div className="space-y-2">
-										<Label htmlFor="instagram">Instagram Handle</Label>
+										<Label htmlFor="phone">Phone Number (Optional)</Label>
 										<Input
-											id="instagram"
-											{...register("instagram")}
-											placeholder="@username"
+											id="phone"
+											{...register("phone")}
+											placeholder="+1 (555) 123-4567"
 										/>
 									</div>
 									<div className="space-y-2">
-										<Label htmlFor="discord">Discord Username</Label>
+										<Label htmlFor="discord">Discord Username (Optional)</Label>
 										<Input
 											id="discord"
 											{...register("discord")}
@@ -424,16 +585,22 @@ export default function SetupPage() {
 										/>
 									</div>
 									<div className="space-y-2">
-										<Label htmlFor="phone">Phone Number</Label>
+										<Label htmlFor="instagram">
+											Instagram Handle (Optional)
+										</Label>
 										<Input
-											id="phone"
-											{...register("phone")}
-											placeholder="+1 (555) 123-4567"
+											id="instagram"
+											{...register("instagram")}
+											placeholder="@username"
 										/>
 									</div>
-									<p className="text-sm text-muted-foreground">
-										These are optional and will only be shared with your matches
-									</p>
+									<div className="p-4 bg-muted rounded-lg">
+										<p className="text-sm text-muted-foreground">
+											<strong>Note:</strong> All contact information is optional
+											and will only be shared with your confirmed matches. You
+											can update this anytime in your profile settings.
+										</p>
+									</div>
 								</div>
 							)}
 
@@ -445,16 +612,10 @@ export default function SetupPage() {
 										Back
 									</Button>
 								)}
-								{step < 4 ? (
-									<Button type="button" onClick={nextStep} className="ml-auto">
-										Next
-										<ArrowRight className="ml-2 h-4 w-4" />
-									</Button>
-								) : (
-									<Button type="submit" className="ml-auto">
-										Complete Setup
-									</Button>
-								)}
+								<Button type="button" onClick={nextStep} className="ml-auto">
+									{step === 4 ? "Complete Setup" : "Next"}
+									<ArrowRight className="ml-2 h-4 w-4" />
+								</Button>
 							</div>
 						</form>
 					</CardContent>
