@@ -25,6 +25,9 @@ export async function GET(request: NextRequest) {
     // Build the where clause for filtering
     const whereClause: any = {
       active_in_cycle: true, // Only show active users
+      email: {
+        not: currentUserEmail, // Exclude the current user
+      },
     };
 
     // Add tag filtering if tags are selected

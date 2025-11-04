@@ -8,9 +8,12 @@ import {
 	Sparkles,
 	CheckCircle2,
 	X,
+	User,
+	LogOut,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -38,6 +41,8 @@ export default function PostingsPage() {
 	const [users, setUsers] = useState<UserProfile[]>([]);
 	const [availableTags, setAvailableTags] = useState<string[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [currentUser, setCurrentUser] = useState<{ firstName?: string; lastName?: string } | null>(null);
+	const [isLoggingOut, setIsLoggingOut] = useState(false);
 
 	// Load applied users from localStorage on mount
 	useEffect(() => {
@@ -53,6 +58,22 @@ export default function PostingsPage() {
 			localStorage.setItem("appliedUsers", JSON.stringify(appliedUsers));
 		}
 	}, [appliedUsers]);
+
+	// Fetch current user profile on mount
+	useEffect(() => {
+		async function fetchCurrentUser() {
+			try {
+				const response = await fetch("/api/profile");
+				if (response.ok) {
+					const data = await response.json();
+					setCurrentUser({ firstName: data.firstName, lastName: data.lastName });
+				}
+			} catch (error) {
+				console.error("Error fetching current user:", error);
+			}
+		}
+		fetchCurrentUser();
+	}, []);
 
 	// Fetch available tags on mount
 	useEffect(() => {
@@ -112,6 +133,23 @@ export default function PostingsPage() {
 		setSelectedTags([]);
 	};
 
+	const handleLogout = async () => {
+		setIsLoggingOut(true);
+		try {
+			const response = await fetch("/api/auth/logout", {
+				method: "POST",
+			});
+
+			if (response.ok) {
+				router.push("/login");
+			}
+		} catch (error) {
+			console.error("Error logging out:", error);
+		} finally {
+			setIsLoggingOut(false);
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-background relative overflow-hidden">
 			{/* Decorative background blobs */}
@@ -126,12 +164,27 @@ export default function PostingsPage() {
 							<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary">
 								<Users className="h-6 w-6 text-primary-foreground" />
 							</div>
-							<span className="text-xl font-bold">RankedMatch</span>
-						</Link>
-						<div className="flex items-center gap-4">
-							<Button size="sm" className="rounded-full">
-								My Applications
-							</Button>
+							<Link
+								href="/matching"
+								className="px-4 py-2 bg-pink-500 text-white rounded-lg font-medium hover:bg-pink-600 transition-colors"
+							>
+								Start Matching
+							</Link>
+							<Link
+								href="/profile"
+								className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+							>
+								<User className="h-4 w-4" />
+								{currentUser?.firstName ? `${currentUser.firstName}` : "Profile"}
+							</Link>
+							<button
+								onClick={handleLogout}
+								disabled={isLoggingOut}
+								className="px-4 py-2 border border-red-300 text-red-700 rounded-lg font-medium hover:bg-red-50 transition-colors flex items-center gap-2 disabled:opacity-50"
+							>
+								<LogOut className="h-4 w-4" />
+								{isLoggingOut ? "Logging out..." : "Logout"}
+							</button>
 						</div>
 					</div>
 				</div>
