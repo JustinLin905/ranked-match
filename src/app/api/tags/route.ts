@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "../../../../generated/prisma";
+import { getCurrentUser } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
 export async function GET() {
   try {
+    // Check authentication
+    const currentUserEmail = await getCurrentUser();
+    if (!currentUserEmail) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
     // Fetch all unique tags from the database
     const tags = await prisma.tag.findMany({
       orderBy: {
