@@ -153,7 +153,7 @@ export default function PostingsPage() {
 			});
 
 			if (response.ok) {
-				router.push("/login");
+				router.push("/");
 			}
 		} catch (error) {
 			console.error("Error logging out:", error);

@@ -11,7 +11,17 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Edit2, Loader2, User, Mail, Phone, Instagram, MessageCircle, LogOut } from "lucide-react";
+import {
+	ArrowLeft,
+	Edit2,
+	Loader2,
+	User,
+	Mail,
+	Phone,
+	Instagram,
+	MessageCircle,
+	LogOut,
+} from "lucide-react";
 import Link from "next/link";
 
 interface ProfileData {
@@ -71,7 +81,7 @@ export default function ProfilePage() {
 		async function fetchProfile() {
 			try {
 				const response = await fetch("/api/profile");
-				
+
 				if (!response.ok) {
 					if (response.status === 401) {
 						router.push("/login");
@@ -100,7 +110,7 @@ export default function ProfilePage() {
 			});
 
 			if (response.ok) {
-				router.push("/login");
+				router.push("/");
 			}
 		} catch (error) {
 			console.error("Error logging out:", error);
@@ -237,7 +247,11 @@ export default function ProfilePage() {
 						<CardContent>
 							<div className="flex flex-wrap gap-2">
 								{profile.highlights.map((highlight, index) => (
-									<Badge key={index} variant="secondary" className="text-sm py-2 px-3">
+									<Badge
+										key={index}
+										variant="secondary"
+										className="text-sm py-2 px-3"
+									>
 										{highlight}
 									</Badge>
 								))}
@@ -255,7 +269,11 @@ export default function ProfilePage() {
 						<CardContent>
 							<div className="flex flex-wrap gap-2">
 								{profile.tags.map((tag) => (
-									<Badge key={tag} variant="default" className="text-sm py-2 px-3">
+									<Badge
+										key={tag}
+										variant="default"
+										className="text-sm py-2 px-3"
+									>
 										{tag}
 									</Badge>
 								))}
@@ -276,7 +294,11 @@ export default function ProfilePage() {
 						<CardContent>
 							<div className="flex flex-wrap gap-2">
 								{activeTerms.map((term) => (
-									<Badge key={term} variant="outline" className="text-sm py-2 px-3">
+									<Badge
+										key={term}
+										variant="outline"
+										className="text-sm py-2 px-3"
+									>
 										{SEMESTER_TERM_LABELS[term] || term}
 									</Badge>
 								))}
@@ -286,38 +308,45 @@ export default function ProfilePage() {
 				)}
 
 				{/* Contact Information */}
-				{(profile.phone || profile.discord || profile.instagram) && (
-					<Card>
-						<CardHeader>
-							<CardTitle>Contact Information</CardTitle>
-							<CardDescription>
-								How matches can reach you
-							</CardDescription>
-						</CardHeader>
-						<CardContent className="space-y-3">
-							{profile.phone && (
-								<div className="flex items-center gap-2">
-									<Phone className="h-4 w-4 text-muted-foreground" />
-									<p className="text-base">{profile.phone}</p>
-								</div>
-							)}
-							{profile.discord && (
-								<div className="flex items-center gap-2">
-									<MessageCircle className="h-4 w-4 text-muted-foreground" />
-									<p className="text-base">{profile.discord}</p>
-								</div>
-							)}
-							{profile.instagram && (
-								<div className="flex items-center gap-2">
-									<Instagram className="h-4 w-4 text-muted-foreground" />
-									<p className="text-base">{profile.instagram}</p>
-								</div>
-							)}
-						</CardContent>
-					</Card>
-				)}
+				<Card>
+					<CardHeader>
+						<CardTitle>Contact Information</CardTitle>
+						<CardDescription>How matches can reach you</CardDescription>
+					</CardHeader>
+					<CardContent className="space-y-3">
+						<div className="flex items-center gap-2">
+							<Phone className="h-4 w-4 text-muted-foreground" />
+							<p className="text-base">
+								{profile.phone || (
+									<span className="text-muted-foreground italic">
+										Not provided
+									</span>
+								)}
+							</p>
+						</div>
+						<div className="flex items-center gap-2">
+							<MessageCircle className="h-4 w-4 text-muted-foreground" />
+							<p className="text-base">
+								{profile.discord || (
+									<span className="text-muted-foreground italic">
+										Not provided
+									</span>
+								)}
+							</p>
+						</div>
+						<div className="flex items-center gap-2">
+							<Instagram className="h-4 w-4 text-muted-foreground" />
+							<p className="text-base">
+								{profile.instagram || (
+									<span className="text-muted-foreground italic">
+										Not provided
+									</span>
+								)}
+							</p>
+						</div>
+					</CardContent>
+				</Card>
 			</div>
 		</div>
 	);
 }
-
