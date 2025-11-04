@@ -35,13 +35,17 @@ interface UserProfile {
 }
 
 export default function PostingsPage() {
+	const router = useRouter();
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [appliedUsers, setAppliedUsers] = useState<string[]>([]);
 	const [users, setUsers] = useState<UserProfile[]>([]);
 	const [availableTags, setAvailableTags] = useState<string[]>([]);
 	const [loading, setLoading] = useState(true);
-	const [currentUser, setCurrentUser] = useState<{ firstName?: string; lastName?: string } | null>(null);
+	const [currentUser, setCurrentUser] = useState<{
+		firstName?: string;
+		lastName?: string;
+	} | null>(null);
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 
 	// Load applied users from localStorage on mount
@@ -66,7 +70,10 @@ export default function PostingsPage() {
 				const response = await fetch("/api/profile");
 				if (response.ok) {
 					const data = await response.json();
-					setCurrentUser({ firstName: data.firstName, lastName: data.lastName });
+					setCurrentUser({
+						firstName: data.firstName,
+						lastName: data.lastName,
+					});
 				}
 			} catch (error) {
 				console.error("Error fetching current user:", error);
@@ -164,18 +171,17 @@ export default function PostingsPage() {
 							<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary">
 								<Users className="h-6 w-6 text-primary-foreground" />
 							</div>
-							<Link
-								href="/matching"
-								className="px-4 py-2 bg-pink-500 text-white rounded-lg font-medium hover:bg-pink-600 transition-colors"
-							>
-								Start Matching
-							</Link>
+							<span className="text-xl font-bold">RankedMatch</span>
+						</Link>
+						<div className="flex items-center gap-4">
 							<Link
 								href="/profile"
 								className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
 							>
 								<User className="h-4 w-4" />
-								{currentUser?.firstName ? `${currentUser.firstName}` : "Profile"}
+								{currentUser?.firstName
+									? `${currentUser.firstName}`
+									: "Profile"}
 							</Link>
 							<button
 								onClick={handleLogout}
