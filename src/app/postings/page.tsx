@@ -481,6 +481,12 @@ export default function Postings() {
 	</div>
 </section>;
 
+interface UserCardProps {
+	user: UserProfile;
+	isApplied: boolean;
+	onApply: () => void;
+}
+
 function UserCard({ user, isApplied, onApply }: UserCardProps) {
 	// Format term to display (convert TERM_1A to 1A)
 	const displayTerm = user.term.replace("TERM_", "");

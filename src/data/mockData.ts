@@ -1,4 +1,4 @@
-import { UserProfile } from "@/types";
+import { UserProfile, Term, Tag } from "@/types";
 
 // Predefined tags for consistency
 const AVAILABLE_TAGS = [
@@ -50,7 +50,7 @@ const MAJORS = [
   'Sociology', 'Anthropology', 'Environmental Science', 'Nursing', 'Medicine'
 ];
 
-const TERMS = ['1A', '1B', '2A', '2B', '3A', '3B', '4A', '4B', '5A', '5B'];
+const TERMS: Term[] = ['TERM_1A', 'TERM_1B', 'TERM_2A', 'TERM_2B', 'TERM_3A', 'TERM_3B', 'TERM_4A', 'TERM_4B', 'TERM_5A', 'TERM_5B'];
 
 const PUBLIC_TITLES = [
   'Sick Basketball Player', 'Coffee Addict', 'Future CEO', 'Art Enthusiast',
@@ -99,14 +99,14 @@ function generateFacts(seed: number): string[] {
 }
 
 // Generate deterministic tags for a user
-function generateTags(seed: number): string[] {
+function generateTags(seed: number): Tag[] {
   const numTags = Math.floor(seededRandom(seed) * 6); // 0-5 tags
   const shuffled = [...AVAILABLE_TAGS].sort((a, b) => {
     const aHash = a.split('').reduce((hash, char) => hash + char.charCodeAt(0), 0);
     const bHash = b.split('').reduce((hash, char) => hash + char.charCodeAt(0), 0);
     return seededRandom(seed + aHash) - seededRandom(seed + bHash);
   });
-  return shuffled.slice(0, numTags);
+  return shuffled.slice(0, numTags).map(tag => ({ value: tag }));
 }
 
 // Generate deterministic social media links
@@ -116,8 +116,8 @@ function generateSocialMedia(seed: number) {
   
   const social: any = {};
   if (seededRandom(seed + 1) > 0.5) social.instagram = `@user${seed}`;
-  if (seededRandom(seed + 2) > 0.5) social.twitter = `@user${seed}`;
-  if (seededRandom(seed + 3) > 0.5) social.linkedin = `linkedin.com/in/user${seed}`;
+  if (seededRandom(seed + 2) > 0.5) social.discord = `user${seed}#1234`;
+  if (seededRandom(seed + 3) > 0.5) social.phone = `+1 (555) ${String(seed).padStart(3, '0')}-${String(seed + 1000).slice(-4)}`;
   
   return social;
 }
@@ -127,15 +127,38 @@ export function generateMockUsers(): UserProfile[] {
   const users: UserProfile[] = [];
   
   for (let i = 0; i < 60; i++) {
+    const fullName = NAMES[i % NAMES.length];
+    const [firstName, lastName] = fullName.split(' ');
+    const socialMedia = generateSocialMedia(i + 500);
+    const termIndex = Math.floor(seededRandom(i + 100) * TERMS.length);
+    
     const user: UserProfile = {
-      id: `user_${i + 1}`,
-      realName: NAMES[i % NAMES.length],
-      publicTitle: PUBLIC_TITLES[i % PUBLIC_TITLES.length],
-      term: TERMS[Math.floor(seededRandom(i + 100) * TERMS.length)],
-      major: MAJORS[Math.floor(seededRandom(i + 200) * MAJORS.length)],
-      facts: generateFacts(i + 300),
+      email: `user${i + 1}@example.com`,
+      firstName: firstName,
+      lastName: lastName,
+      program: MAJORS[Math.floor(seededRandom(i + 200) * MAJORS.length)],
       tags: generateTags(i + 400),
-      socialMediaLinks: generateSocialMedia(i + 500)
+      highlights: generateFacts(i + 300),
+      term: TERMS[termIndex],
+      sequence: {
+        TERM_1A: seededRandom(i + 600) > 0.5,
+        TERM_1B: seededRandom(i + 601) > 0.5,
+        TERM_2A: seededRandom(i + 602) > 0.5,
+        TERM_2B: seededRandom(i + 603) > 0.5,
+        TERM_3A: seededRandom(i + 604) > 0.5,
+        TERM_3B: seededRandom(i + 605) > 0.5,
+        TERM_4A: seededRandom(i + 606) > 0.5,
+        TERM_4B: seededRandom(i + 607) > 0.5,
+        TERM_5A: seededRandom(i + 608) > 0.5,
+        TERM_5B: seededRandom(i + 609) > 0.5,
+      },
+      bio: `${PUBLIC_TITLES[i % PUBLIC_TITLES.length]}. Passionate about learning and connecting with like-minded people.`,
+      active_in_cycle: seededRandom(i + 700) > 0.3,
+      instagram: socialMedia.instagram || null,
+      discord: socialMedia.discord || null,
+      phone: socialMedia.phone || null,
+      createdAt: new Date(Date.now() - Math.floor(seededRandom(i + 800) * 30 * 24 * 60 * 60 * 1000)),
+      updatedAt: new Date(),
     };
     
     users.push(user);
